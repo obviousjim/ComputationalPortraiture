@@ -88,7 +88,7 @@ void ofApp::draw(){
 		ofDisableDepthTest();
 	}
 
-	copyMesh.draw();
+	//copyMesh.draw();
 
 	ofPopMatrix();
 	ofPopStyle();
