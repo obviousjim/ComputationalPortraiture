@@ -21,6 +21,7 @@ class ofApp : public ofBaseApp{
 	void exit();
     
 	ofVboMesh mesh;
+	ofVboMesh copyMesh;
 	ofEasyCam cam;
 
 };
