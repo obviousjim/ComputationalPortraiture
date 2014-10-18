@@ -15,6 +15,43 @@ void ofApp::setup(){
 void ofApp::update(){
 	if(mesh.getNumVertices() > 0){
 		cam.setTarget( mesh.getCentroid() * 1000 );
+
+		copyMesh.clear();
+		//go through each triangle, stepping indices of 3
+		for(int i = 0; i < mesh.getNumIndices(); i += 3){
+			//for 1 in 20 triangles create a duplicate and  send it out alone its normal
+
+			//how many to triangles to delete
+			int divider = ofMap(ofGetMouseY(), 0, ofGetHeight(), 1, 100, true);
+
+			if( (i/3) % divider == 0){
+
+				//each three consecutive indices define a triangle, lets grab them
+				ofIndexType indexA = mesh.getIndex(i);
+				ofIndexType indexB = mesh.getIndex(i+1);
+				ofIndexType indexC = mesh.getIndex(i+2);
+
+				//...and pull out the vertices they refer to...
+				ofVec3f vertA = mesh.getVertex(indexA);  
+				ofVec3f vertB = mesh.getVertex(indexB);  
+				ofVec3f vertC = mesh.getVertex(indexC); 
+
+				//...and the normal attribute for each one. this points away from the model
+				//.. PLYS in OF from Kinect Fusion doesn't seem to load normals, 
+				//... let's make one up for each face based on cross products
+				ofVec3f normal = -(vertA-vertB).getCrossed(vertC-vertB).normalized();
+
+				//we will move this triangle away from the model in the direction of the normal by scalar amount
+				float normalScale = ofMap(ofGetMouseX(), 0, ofGetWidth(), 0.0, 1.0); //still very small
+
+				copyMesh.addVertex(vertA + normal * normalScale);
+				copyMesh.addVertex(vertB + normal * normalScale);
+				copyMesh.addVertex(vertC + normal * normalScale);
+
+			}
+		}
+
+		copyMesh.setMode(OF_PRIMITIVE_TRIANGLES);
 	}
 }
 
@@ -47,6 +84,7 @@ void ofApp::draw(){
 	else {
 		ofEnableDepthTest();
 		mesh.draw();
+		copyMesh.draw();
 		ofDisableDepthTest();
 	}
 
@@ -111,28 +149,6 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 		cout << "loading mesh " << dragInfo.files[0] << endl;
 		mesh.load( dragInfo.files[0] );
 
-		copyMesh.clear();
 
-		for(int i = 0; i < mesh.getNumIndices(); i += 3){
-			if( (i/3) % 100 == 0){
-				ofIndexType indexA = mesh.getIndex(i);
-				ofIndexType indexB = mesh.getIndex(i+1);
-				ofIndexType indexC = mesh.getIndex(i+2);
-
-				ofVec3f vertA = mesh.getVertex(indexA);  
-				ofVec3f vertB = mesh.getVertex(indexB);  
-				ofVec3f vertC = mesh.getVertex(indexC);  
-
-				ofVec3f normal = (vertB-vertA).getCrossed(vertC-vertA).normalized();
-				normal *= .1;
-
-				copyMesh.addVertex(vertA + normal);
-				copyMesh.addVertex(vertB + normal);
-				copyMesh.addVertex(vertC + normal);
-
-			}
-		}
-
-		copyMesh.setMode(OF_PRIMITIVE_TRIANGLES);
 	}
 }
