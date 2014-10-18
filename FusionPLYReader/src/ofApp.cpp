@@ -42,7 +42,7 @@ void ofApp::update(){
 				ofVec3f normal = -(vertA-vertB).getCrossed(vertC-vertB).normalized();
 
 				//we will move this triangle away from the model in the direction of the normal by scalar amount
-				float normalScale = ofMap(ofGetMouseX(), 0, ofGetWidth(), 0.0, 1.0); //still very small
+				float normalScale = ofMap(ofGetMouseX(), 0, ofGetWidth(), 0.0, 1.0, true); //still very small
 
 				copyMesh.addVertex(vertA + normal * normalScale);
 				copyMesh.addVertex(vertB + normal * normalScale);
